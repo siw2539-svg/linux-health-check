@@ -1,0 +1,23 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck health_check.sh
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: ruff
+        run: pip install --quiet ruff && ruff check .
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: pytest
+        run: pip install --quiet pytest && pytest -v
+      - name: health check smoke run
+        run: bash health_check.sh -d 99 -m 99 -l 10 || true
